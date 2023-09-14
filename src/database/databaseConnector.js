@@ -2,7 +2,7 @@
 const { MongoClient } = require("mongodb");
 require("dotenv").config();
 
-// Load MongoDB Atlas credentials from .env
+// Load MongoDB URI with credentials and Database Name from .env
 const { MONGODB_URI, MONGODB_DB } = process.env;
 
 let dbClient;
