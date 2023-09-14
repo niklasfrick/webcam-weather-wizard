@@ -26,7 +26,7 @@
   "scripts": {
     "test": "jest",
     "test:watch": "npm run test -- --watch",
-    "lint-staged": "lint-staged — config .lintstagedrc",
+    "lint-staged": "lint-staged",
     "commit": "./node_modules/cz-customizable/standalone.js"
   },
   "repository": {
