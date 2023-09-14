@@ -1,0 +1,41 @@
+{
+  "name": "webcam-weather-wizard",
+  "version": "1.0.0",
+  "description": "Webcam image analysis for instant weather data extraction and terrain analysis.",
+  "main": "app.js",
+  "config": {
+    "commitizen": {
+      "path": "cz-customizable"
+    }
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint-staged": "lint-staged — config .lintstagedrc",
+    "commit": "./node_modules/cz-customizable/standalone.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/niklasfrick/webcam-weather-wizard.git"
+  },
+  "keywords": [
+    "webcam",
+    "weather",
+    "terrain",
+    "data"
+  ],
+  "author": "Niklas Frick",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/niklasfrick/webcam-weather-wizard/issues"
+  },
+  "homepage": "https://github.com/niklasfrick/webcam-weather-wizard#readme",
+  "devDependencies": {
+    "commitlint": "^17.7.1",
+    "commitlint-config-gitmoji": "^2.3.1",
+    "cz-customizable": "^7.0.0",
+    "eslint": "^8.49.0",
+    "husky": "^8.0.3",
+    "lint-staged": "^14.0.1",
+    "prettier": "^3.0.3"
+  }
+}
