@@ -133,3 +133,5 @@ make-dev-stats.csv
 
 .uuid
 tsconfig.tsbuildinfo
+
+*.env
