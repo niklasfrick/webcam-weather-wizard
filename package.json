@@ -13,6 +13,14 @@
       "<rootDir>/test/"
     ]
   },
+  "lint-staged": {
+    "./**/*.{js,ts,json,css,scss,md}": [
+      "prettier --write"
+    ],
+    "src/**/*.+(js,ts,json,css,scss,md)": [
+      "tslint"
+    ]
+  },
   "scripts": {
     "test": "jest",
     "test:watch": "npm run test -- --watch",
