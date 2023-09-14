@@ -18,6 +18,7 @@
       "prettier --write"
     ],
     "src/**/*.+(js,ts,json,css,scss,md)": [
+      "prettier --write",
       "eslint --fix",
       "npm run test"
     ]
