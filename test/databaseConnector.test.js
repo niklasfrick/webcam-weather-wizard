@@ -1,4 +1,3 @@
-// mongodbConnector.test.js
 const { MongoClient } = require("mongodb");
 const {
   connectToDatabase,
