@@ -1,3 +1,4 @@
+const axios = require("axios");
 const { createWorker } = require("tesseract.js");
 const cron = require("node-cron");
 require("dotenv").config();
@@ -23,6 +24,20 @@ function constructImageUrl() {
   return `${baseUrl}${imageName}`;
 }
 
+// Function to check if the desired image exists
+async function checkImageUrlExists(url) {
+  try {
+    const response = await axios.head(url);
+    return response.status === 200;
+  } catch (error) {
+    if (error.response && error.response.status === 404) {
+      return false; // URL returns a 404 status code
+    } else {
+      throw error; // Other error occurred
+    }
+  }
+}
+
 // Function to extract text from an image URL
 async function extractTextFromImage() {
   const imageUrl = constructImageUrl();
@@ -44,7 +59,22 @@ async function extractTextFromImage() {
 cron.schedule("*/2 6-21 * * *", () => {
   const now = new Date();
   console.log(`Running at ${now.toLocaleTimeString()}`);
-  setTimeout(() => extractTextFromImage(), 30000); // wait 30 seconds before running, the webcam lags behind a couple of seconds
+
+  // first wait 30 seconds before running, the webcam lags behind a couple of seconds
+  setTimeout(function () {
+    const imageUrl = constructImageUrl();
+    checkImageUrlExists(imageUrl)
+      .then((exists) => {
+        if (exists) {
+          extractTextFromImage();
+        } else {
+          console.log("Image not available");
+        }
+      })
+      .catch((error) => {
+        console.error("An error occurred:", error.message);
+      });
+  }, 30000); // 30000 millisecons = 30 seconds
 });
 
 console.log("OCR program scheduled. Press Ctrl+C to exit.");
