@@ -96,3 +96,6 @@ Temporary Items
 *.env
 
 src/webcam/images
+
+# tesseract traineddata
+*.traineddata
