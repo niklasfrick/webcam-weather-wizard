@@ -40,11 +40,11 @@ async function extractTextFromImage() {
   console.log(text);
 }
 
-// Schedule the program to run every three minutes between 6:00 and 21:58
-cron.schedule("1-59/3 6-21 * * *", () => {
+// Schedule the program to run every two minutes between 6:00 and 21:58
+cron.schedule("*/2 6-21 * * *", () => {
   const now = new Date();
   console.log(`Running at ${now.toLocaleTimeString()}`);
-  extractTextFromImage();
+  setTimeout(() => extractTextFromImage(), 30000); // wait 30 seconds before running, the webcam lags behind a couple of seconds
 });
 
 console.log("OCR program scheduled. Press Ctrl+C to exit.");
