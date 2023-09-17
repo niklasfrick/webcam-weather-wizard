@@ -13,8 +13,7 @@ async function extractTextFromImage(imagePath) {
   } = await worker.recognize(preprocessedImagePath);
   await worker.terminate();
 
-  console.log("Text extracted from the image:");
-  console.log(text);
+  return text;
 }
 
 module.exports = {
