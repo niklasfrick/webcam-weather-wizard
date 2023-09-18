@@ -1,6 +1,6 @@
-const { createCanvas, loadImage } = require("canvas");
-const fs = require("fs");
-const path = require("path");
+const { createCanvas, loadImage } = require('canvas');
+const fs = require('fs');
+const path = require('path');
 
 async function preprocessImage(inputImagePath, outputPath) {
   // Load the input image
@@ -8,7 +8,7 @@ async function preprocessImage(inputImagePath, outputPath) {
 
   // Create a canvas to work with
   const canvas = createCanvas(image.width, image.height);
-  const ctx = canvas.getContext("2d");
+  const ctx = canvas.getContext('2d');
 
   // Draw the input image onto the canvas
   ctx.drawImage(image, 0, 0);
@@ -21,67 +21,39 @@ async function preprocessImage(inputImagePath, outputPath) {
 
   // Crop the canvas to the specified coordinates
   const croppedCanvas = createCanvas(width, height);
-  const croppedCtx = croppedCanvas.getContext("2d");
+  const croppedCtx = croppedCanvas.getContext('2d');
   croppedCtx.drawImage(canvas, x, y, width, height, 0, 0, width, height);
 
   // Convert the cropped image to grayscale
   const grayscaleCanvas = createCanvas(width, height);
-  const grayscaleCtx = grayscaleCanvas.getContext("2d");
+  const grayscaleCtx = grayscaleCanvas.getContext('2d');
   grayscaleCtx.drawImage(croppedCanvas, 0, 0, width, height);
   const grayscaleImageData = grayscaleCtx.getImageData(0, 0, width, height);
   for (let i = 0; i < grayscaleImageData.data.length; i += 4) {
-    const average =
-      (grayscaleImageData.data[i] +
-        grayscaleImageData.data[i + 1] +
-        grayscaleImageData.data[i + 2]) /
-      3;
-    grayscaleImageData.data[i] =
-      grayscaleImageData.data[i + 1] =
-      grayscaleImageData.data[i + 2] =
-        average;
+    const average = (grayscaleImageData.data[i] + grayscaleImageData.data[i + 1] + grayscaleImageData.data[i + 2]) / 3;
+    grayscaleImageData.data[i] = grayscaleImageData.data[i + 1] = grayscaleImageData.data[i + 2] = average;
   }
   grayscaleCtx.putImageData(grayscaleImageData, 0, 0);
 
-  // Binarize the grayscale image (convert to black and white)
-  const binarizedCanvas = createCanvas(width, height);
-  const binarizedCtx = binarizedCanvas.getContext("2d");
-  binarizedCtx.drawImage(grayscaleCanvas, 0, 0, width, height);
-  const binarizedImageData = binarizedCtx.getImageData(0, 0, width, height);
-  for (let i = 0; i < binarizedImageData.data.length; i += 4) {
-    const average =
-      (binarizedImageData.data[i] +
-        binarizedImageData.data[i + 1] +
-        binarizedImageData.data[i + 2]) /
-      3;
-    const binaryValue = average < 128 ? 0 : 255; // Threshold for binarization
-    binarizedImageData.data[i] =
-      binarizedImageData.data[i + 1] =
-      binarizedImageData.data[i + 2] =
-        binaryValue;
-  }
-  binarizedCtx.putImageData(binarizedImageData, 0, 0);
-
   // Create the "preprocessed" folder if it doesn't exist
-  const outputFolder = path.join(__dirname, "./images/preprocessed");
+  const outputFolder = path.join(__dirname, './images/preprocessed');
   if (!fs.existsSync(outputFolder)) {
     fs.mkdirSync(outputFolder);
   }
 
   // Generate the output file path in the "preprocessed" folder
-  const outputImageName =
-    path.basename(inputImagePath, path.extname(inputImagePath)) +
-    "_preprocessed.jpg";
+  const outputImageName = path.basename(inputImagePath, path.extname(inputImagePath)) + '_preprocessed.jpg';
   const outputImagePath = path.join(outputFolder, outputImageName);
 
   // Save the preprocessed image with the "_preprocessed" suffix as a JPG
   const outputImageStream = fs.createWriteStream(outputImagePath);
-  const stream = binarizedCanvas.createJPEGStream({ quality: 100 }); // Adjust quality as needed
+  const stream = grayscaleCanvas.createJPEGStream({ quality: 100 }); // Adjust quality as needed
   stream.pipe(outputImageStream);
 
   // Wait for the image to be saved
   await new Promise((resolve, reject) => {
-    outputImageStream.on("finish", resolve);
-    outputImageStream.on("error", reject);
+    outputImageStream.on('finish', resolve);
+    outputImageStream.on('error', reject);
   });
 
   return outputImagePath;

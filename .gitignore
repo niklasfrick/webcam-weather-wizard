@@ -99,3 +99,4 @@ src/webcam/images
 
 # tesseract traineddata
 *.traineddata
+.prettierrc
