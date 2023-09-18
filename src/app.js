@@ -1,4 +1,8 @@
 const extractWebcamData = require('./webcam/webcamData');
 
-const snapshotDataObject = extractWebcamData();
-console.log(snapshotDataObject);
+async function main() {
+  const snapshotDataObject = await extractWebcamData(); // Use await because extractWebcamData is async
+  console.log(snapshotDataObject);
+}
+
+main();

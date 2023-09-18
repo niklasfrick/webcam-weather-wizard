@@ -10,6 +10,15 @@ async function extractWeatherData() {
   imageUrl = process.env.NODE_ENV === 'production' ? (imageUrl = constructImageUrl()) : (imageUrl = process.env.WEBCAM_TEST_IMAGE_URL);
 
   let imagePath;
+  let snapshotDataObject = {
+    // Initialize with default values
+    date_time: null,
+    temperature_celsius: null,
+    wind_speed_kph: null,
+    total_precipitation_mm: null,
+    snow_coverage: null,
+    detected_objects: null,
+  };
 
   try {
     console.log('Fetching: ', imageUrl);
@@ -54,10 +63,27 @@ async function extractWeatherData() {
     }
 
     if (timeMatch) {
-      dateTime = timeMatch[1];
+      // Format the extracted time as ISO 8601 without changing the timezone
+      const [hours, minutes, seconds] = timeMatch[1].split(':');
+      const now = new Date();
+      // Check if daylight saving time (DST) is currently in effect (CEST)
+      const isDST = (() => {
+        const startDST = new Date(now.getFullYear(), 2, 31 - ((14 - now.getDay() + 7) % 7), 1, 0, 0, 0); // Last Sunday in March
+        const endDST = new Date(now.getFullYear(), 9, 31 - ((14 - now.getDay() + 7) % 7), 1, 0, 0, 0); // Last Sunday in October
+        return now >= startDST && now < endDST;
+      })();
+
+      // Apply the appropriate timezone offset (+02:00 for CEST, +01:00 for CET)
+      const offset = isDST ? '+02:00' : '+01:00';
+
+      // Construct the ISO 8601 formatted string with the same hour, minute, and second values
+      dateTime = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(
+        2,
+        '0',
+      )}T${hours}:${minutes}:${seconds}${offset}`;
     }
 
-    const snapshotDataObject = {
+    snapshotDataObject = {
       date_time: dateTime,
       temperature_celsius: temperature,
       wind_speed_kph: windSpeed,
@@ -65,25 +91,15 @@ async function extractWeatherData() {
       //snow_coverage: 0,
       //detected_objects: ['building', 'car', 'road'],
     };
-
-    console.log('Weather data extracted from the image:');
-    console.log(weatherData);
-
-    console.log('Temperature: ', temperature);
-    console.log('Wind Speed: ', windSpeed);
-    console.log('Precipitation: ', precipitation);
-
-    console.log('Time data extracted from the image:');
-    console.log(timeData);
-    console.log('Time: ', dateTime);
-    return snapshotDataObject;
   }
+  return snapshotDataObject;
 }
 
 async function extractWebcamData() {
   if (process.env.NODE_ENV === 'development') {
     // run the program instantly for testing purposes
-    await extractWeatherData();
+    let snapshotDataObject = await extractWeatherData();
+    return snapshotDataObject;
   } else {
     console.log('Webcam Data extraction scheduled. Press Ctrl+C to exit.');
     // Schedule the program to run every two minutes between 6:00 and 21:58
@@ -92,7 +108,8 @@ async function extractWebcamData() {
       console.log(`Running at ${now.toLocaleTimeString()}`);
 
       setTimeout(async () => {
-        await extractWeatherData();
+        let snapshotDataObject = await extractWeatherData();
+        return snapshotDataObject;
       }, 30000);
     });
   }
