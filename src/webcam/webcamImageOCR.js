@@ -12,7 +12,7 @@ async function extractTextFromImage(imagePath, dataType) {
     },
     timeData: {
       topLeftX: 1081,
-      topLeftY: 0,
+      topLeftY: -5,
       bottomRightX: 1280,
       bottomRightY: 10,
     },

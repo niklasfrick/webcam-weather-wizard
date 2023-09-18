@@ -1,3 +1,3 @@
-const extractWeatherData = require("./webcam/webcamWeatherData");
+const extractWebcamData = require('./webcam/webcamData');
 
-extractWeatherData();
+extractWebcamData();
