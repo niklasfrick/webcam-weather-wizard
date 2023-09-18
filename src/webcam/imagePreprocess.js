@@ -2,55 +2,57 @@ const { createCanvas, loadImage } = require('canvas');
 const fs = require('fs');
 const path = require('path');
 
-async function preprocessImage(inputImagePath, outputPath) {
-  // Load the input image
+// Function to crop an image based on coordinates
+async function cropImage(inputImagePath, topLeftX, topLeftY, bottomRightX, bottomRightY) {
   const image = await loadImage(inputImagePath);
-
-  // Create a canvas to work with
   const canvas = createCanvas(image.width, image.height);
   const ctx = canvas.getContext('2d');
-
-  // Draw the input image onto the canvas
   ctx.drawImage(image, 0, 0);
 
-  // Define the new coordinates of the text box to isolate (Top Left: (1, 26), Bottom Right: (93, 75))
-  const x = 1;
-  const y = 26;
-  const width = 93 - 1; // Calculate the width
-  const height = 75 - 26; // Calculate the height
+  const x = topLeftX;
+  const y = topLeftY;
+  const width = bottomRightX - topLeftX;
+  const height = bottomRightY - topLeftY;
 
-  // Crop the canvas to the specified coordinates
   const croppedCanvas = createCanvas(width, height);
   const croppedCtx = croppedCanvas.getContext('2d');
   croppedCtx.drawImage(canvas, x, y, width, height, 0, 0, width, height);
 
-  // Convert the cropped image to grayscale
-  const grayscaleCanvas = createCanvas(width, height);
-  const grayscaleCtx = grayscaleCanvas.getContext('2d');
-  grayscaleCtx.drawImage(croppedCanvas, 0, 0, width, height);
-  const grayscaleImageData = grayscaleCtx.getImageData(0, 0, width, height);
-  for (let i = 0; i < grayscaleImageData.data.length; i += 4) {
-    const average = (grayscaleImageData.data[i] + grayscaleImageData.data[i + 1] + grayscaleImageData.data[i + 2]) / 3;
-    grayscaleImageData.data[i] = grayscaleImageData.data[i + 1] = grayscaleImageData.data[i + 2] = average;
-  }
-  grayscaleCtx.putImageData(grayscaleImageData, 0, 0);
+  return croppedCanvas;
+}
 
-  // Create the "preprocessed" folder if it doesn't exist
+// Function to convert an image to grayscale
+function convertToGrayscale(canvas) {
+  const ctx = canvas.getContext('2d');
+  const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+
+  for (let i = 0; i < imageData.data.length; i += 4) {
+    const average = (imageData.data[i] + imageData.data[i + 1] + imageData.data[i + 2]) / 3;
+    imageData.data[i] = imageData.data[i + 1] = imageData.data[i + 2] = average;
+  }
+
+  ctx.putImageData(imageData, 0, 0);
+}
+
+// Function to preprocess an image
+async function preprocessImage(inputImagePath, dataType, topLeftX, topLeftY, bottomRightX, bottomRightY) {
   const outputFolder = path.join(__dirname, './images/preprocessed');
   if (!fs.existsSync(outputFolder)) {
     fs.mkdirSync(outputFolder);
   }
 
-  // Generate the output file path in the "preprocessed" folder
-  const outputImageName = path.basename(inputImagePath, path.extname(inputImagePath)) + '_preprocessed.jpg';
+  const preprocessedImageSuffix = dataType === 'weatherData' ? '_wd' : '_td';
+
+  const outputImageName = path.basename(inputImagePath, path.extname(inputImagePath)) + `${preprocessedImageSuffix}.jpg`;
   const outputImagePath = path.join(outputFolder, outputImageName);
 
-  // Save the preprocessed image with the "_preprocessed" suffix as a JPG
+  const croppedCanvas = await cropImage(inputImagePath, topLeftX, topLeftY, bottomRightX, bottomRightY);
+  convertToGrayscale(croppedCanvas);
+
   const outputImageStream = fs.createWriteStream(outputImagePath);
-  const stream = grayscaleCanvas.createJPEGStream({ quality: 100 }); // Adjust quality as needed
+  const stream = croppedCanvas.createJPEGStream({ quality: 100 });
   stream.pipe(outputImageStream);
 
-  // Wait for the image to be saved
   await new Promise((resolve, reject) => {
     outputImageStream.on('finish', resolve);
     outputImageStream.on('error', reject);

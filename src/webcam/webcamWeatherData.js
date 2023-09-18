@@ -1,7 +1,8 @@
 const cron = require('node-cron');
+require('dotenv').config();
 
-const { downloadImage } = require('./webcamImageDownload'); // Import the downloadImage and checkImageUrlExists modules
-const { extractTextFromImage } = require('./webcamImageOCR'); // Import the extractTextFromImage module
+const { downloadImage } = require('./webcamImageDownload');
+const { extractTextFromImage } = require('./webcamImageOCR');
 const { constructImageUrl } = require('./fileUtils');
 
 function extractWeatherData() {
@@ -10,10 +11,14 @@ function extractWeatherData() {
     const now = new Date();
     console.log(`Running at ${now.toLocaleTimeString()}`);
 
+    // Check if NODE_ENV is 'development' and set the timeout accordingly
+    const timeout = process.env.NODE_ENV === 'development' ? 0 : 30000; // 0 milliseconds for development, 30 seconds for production
+
     // first wait 30 seconds before running, the webcam lags behind a couple of seconds
     setTimeout(async () => {
-      // const imageUrl = constructImageUrl();
-      imageUrl = 'https://www.webcam.valuenalopp.li/_webcham01/bilder/2309130826.jpg';
+      let imageUrl;
+      imageUrl = process.env.NODE_ENV === 'production' ? (imageUrl = constructImageUrl()) : (imageUrl = process.env.WEBCAM_TEST_IMAGE_URL);
+
       let imagePath;
 
       try {
@@ -24,9 +29,10 @@ function extractWeatherData() {
       }
 
       if (imagePath) {
-        const text = await extractTextFromImage(imagePath);
+        const weatherData = await extractTextFromImage(imagePath, 'weatherData');
+        const timeData = await extractTextFromImage(imagePath, 'timeData');
 
-        // Regular expressions to extract numbers with optional decimal points
+        // Regular expressions to extract numbers with optional decimal points from weather data
         const temperatureRegex = /([\d.]+)\s*°C/;
         const windSpeedRegex = /([\d.]+)\s*km\/?[hn]/; // "h" is optional, and "n" is also allowed
         const precipitationRegex = /([\d.]+)\s*mm heute/;
@@ -35,11 +41,12 @@ function extractWeatherData() {
         let temperature = null;
         let windSpeed = null;
         let precipitation = null;
+        let time = null;
 
         // Extract numbers using regular expressions
-        const temperatureMatch = text.match(temperatureRegex);
-        const windSpeedMatch = text.match(windSpeedRegex);
-        const precipitationMatch = text.match(precipitationRegex);
+        const temperatureMatch = weatherData.match(temperatureRegex);
+        const windSpeedMatch = weatherData.match(windSpeedRegex);
+        const precipitationMatch = weatherData.match(precipitationRegex);
 
         // Assign extracted numbers to variables, or null if not found
         if (temperatureMatch) {
@@ -54,17 +61,20 @@ function extractWeatherData() {
           precipitation = parseFloat(precipitationMatch[1]);
         }
 
-        console.log('Text extracted from the image:');
-        console.log(text);
+        console.log('Weather data extracted from the image:');
+        console.log(weatherData);
 
         console.log('Temperature: ', temperature);
         console.log('Wind Speed: ', windSpeed);
         console.log('Precipitation: ', precipitation);
+
+        console.log('Time data extracted from the image:');
+        console.log(timeData);
       }
-    }, 30000); // 30000 milliseconds = 30 seconds
+    }, timeout);
   });
 
-  console.log('OCR program scheduled. Press Ctrl+C to exit.');
+  console.log('Webcam Data extraction scheduled. Press Ctrl+C to exit.');
 }
 
 module.exports = extractWeatherData;

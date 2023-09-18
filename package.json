@@ -24,9 +24,9 @@
     ]
   },
   "scripts": {
-    "start": "node src/app.js",
-    "dev": "nodemon --watch src src/app.js",
-    "dev:inspect": "nodemon --inspect --watch src src/app.js",
+    "start": "NODE_ENV=production node src/app.js",
+    "dev": "NODE_ENV=development nodemon --watch src src/app.js",
+    "dev:inspect": "NODE_ENV=development nodemon --inspect --watch src src/app.js",
     "test": "jest",
     "test:watch": "npm run test -- --watch",
     "lint-staged": "lint-staged",
