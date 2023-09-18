@@ -22,21 +22,23 @@ async function extractWeatherData() {
     const weatherData = await extractTextFromImage(imagePath, 'weatherData');
     const timeData = await extractTextFromImage(imagePath, 'timeData');
 
-    // Regular expressions to extract numbers with optional decimal points from weather data
+    // Regular expressions to extract data
     const temperatureRegex = /([\d.]+)\s*°C/;
     const windSpeedRegex = /([\d.]+)\s*km\/?[hn]/; // "h" is optional, and "n" is also allowed
     const precipitationRegex = /([\d.]+)\s*mm heute/;
+    const timeRegex = /\b(\d{2}:\d{2}:\d{2})\b/;
 
     // Initialize variables with null values
     let temperature = null;
     let windSpeed = null;
     let precipitation = null;
-    let time = null;
+    let dateTime = null;
 
-    // Extract numbers using regular expressions
+    // Extract data using regular expressions
     const temperatureMatch = weatherData.match(temperatureRegex);
     const windSpeedMatch = weatherData.match(windSpeedRegex);
     const precipitationMatch = weatherData.match(precipitationRegex);
+    const timeMatch = timeData.match(timeRegex);
 
     // Assign extracted numbers to variables, or null if not found
     if (temperatureMatch) {
@@ -51,6 +53,19 @@ async function extractWeatherData() {
       precipitation = parseFloat(precipitationMatch[1]);
     }
 
+    if (timeMatch) {
+      dateTime = timeMatch[1];
+    }
+
+    const snapshotDataObject = {
+      date_time: dateTime,
+      temperature_celsius: temperature,
+      wind_speed_kph: windSpeed,
+      total_precipitation_mm: precipitation,
+      //snow_coverage: 0,
+      //detected_objects: ['building', 'car', 'road'],
+    };
+
     console.log('Weather data extracted from the image:');
     console.log(weatherData);
 
@@ -60,6 +75,8 @@ async function extractWeatherData() {
 
     console.log('Time data extracted from the image:');
     console.log(timeData);
+    console.log('Time: ', dateTime);
+    return snapshotDataObject;
   }
 }
 

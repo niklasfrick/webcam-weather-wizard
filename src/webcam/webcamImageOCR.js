@@ -11,10 +11,10 @@ async function extractTextFromImage(imagePath, dataType) {
       bottomRightY: 75,
     },
     timeData: {
-      topLeftX: 1081,
-      topLeftY: -5,
-      bottomRightX: 1280,
-      bottomRightY: 10,
+      topLeftX: 1080,
+      topLeftY: -10,
+      bottomRightX: 1290,
+      bottomRightY: 15,
     },
   };
   const { topLeftX, topLeftY, bottomRightX, bottomRightY } = cropCoordinates[dataType];

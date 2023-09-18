@@ -1,3 +1,4 @@
 const extractWebcamData = require('./webcam/webcamData');
 
-extractWebcamData();
+const snapshotDataObject = extractWebcamData();
+console.log(snapshotDataObject);
