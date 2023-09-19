@@ -1,6 +1,6 @@
 const cron = require('node-cron');
 const extractWebcamData = require('./webcam/webcamData');
-const { writeSnapshotData } = require('./database/databaseCommands');
+const { writeSnapshotData, readSnapshotData } = require('./database/databaseCommands');
 
 // Configuration
 const schedule = '*/2 6-21 * * *'; // Every two minutes between 6:00 and 21:58
@@ -9,10 +9,13 @@ const delay = 30000; // 30 seconds delay before running extractWebcamData
 async function main() {
   if (process.env.NODE_ENV === 'development') {
     // Run the program instantly for testing purposes
-    const snapshotData = await extractWebcamData();
-
-    console.log(snapshotData);
-    writeSnapshotData(snapshotData);
+    try {
+      const snapshotData = await extractWebcamData();
+      console.log(snapshotData);
+      writeSnapshotData(snapshotData);
+    } catch (error) {
+      console.error('Error while extracting webcam data:', error);
+    }
   } else {
     // Schedule the program to run on a schedule in production
     console.log('Webcam Data extraction scheduled. Press Ctrl+C to exit.');
@@ -25,6 +28,7 @@ async function main() {
         try {
           const snapshotData = await extractWebcamData();
           console.log(snapshotData);
+          writeSnapshotData(snapshotData);
         } catch (error) {
           console.error('Error while extracting webcam data:', error);
         }

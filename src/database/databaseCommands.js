@@ -39,21 +39,4 @@ async function writeSnapshotData(snapshotData) {
   closeDatabase();
 }
 
-// function to read data from the database
-async function readSnapshotData() {
-  const db = await connectToDatabase();
-  const collection = db.collection('snapshot-data');
-
-  try {
-    const result = await collection.find().toArray();
-    console.log(`Found ${result.length} documents in the database`);
-    return result;
-  } catch (error) {
-    console.error('Error reading documents from the database:', error);
-    return error;
-  }
-
-  closeDatabase();
-}
-
-module.exports = { writeSnapshotData, readSnapshotData };
+module.exports = { writeSnapshotData };
