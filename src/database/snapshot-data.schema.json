@@ -1,48 +1,38 @@
 {
-  "$jsonSchema": {
-    "bsonType": "object",
-    "required": ["date_time"],
-    "properties": {
-      "date_time": {
-        "bsonType": "string",
-        "format": "date-time",
-        "description": "Must be a valid date-time string and required"
-      },
-      "temperature_celsius": {
-        "bsonType": ["number", "null"],
-        "default": null,
-        "minimum": -100,
-        "maximum": 100,
-        "description": "Must be a number within the range of -100 to 100 or null"
-      },
-      "wind_speed_kph": {
-        "bsonType": ["number", "null"],
-        "default": null,
-        "minimum": 0,
-        "description": "Must be a non-negative number or null"
-      },
-      "total_precipitation_mm": {
-        "bsonType": ["number", "null"],
-        "default": null,
-        "minimum": 0,
-        "description": "Must be a non-negative number or null"
-      },
-      "snow_coverage": {
-        "bsonType": ["number", "null"],
-        "default": null,
-        "minimum": 0,
-        "maximum": 10,
-        "description": "Must be a number between 0 and 10 or null"
-      },
-      "detected_objects": {
-        "bsonType": ["array", "null"],
-        "default": null,
-        "items": {
-          "bsonType": "string",
-          "description": "Must be a string"
-        },
-        "description": "Must be an array of strings or null"
+  "type": "object",
+  "properties": {
+    "date_time": {
+      "type": "string",
+      "format": "custom-date-time"
+    },
+    "temperature_celsius": {
+      "type": ["number", "null"],
+      "default": null,
+      "minimum": -100,
+      "maximum": 100
+    },
+    "wind_speed_kph": {
+      "type": ["number", "null"],
+      "default": null,
+      "minimum": 0
+    },
+    "total_precipitation_mm": {
+      "type": ["number", "null"],
+      "default": null,
+      "minimum": 0
+    },
+    "snow_coverage": {
+      "type": ["number", "null"],
+      "default": null,
+      "minimum": 0,
+      "maximum": 10
+    },
+    "detected_objects": {
+      "type": ["array", "null"],
+      "items": {
+        "type": "string"
       }
     }
-  }
+  },
+  "required": ["date_time"]
 }

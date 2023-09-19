@@ -1,24 +1,15 @@
-const cron = require('node-cron');
 require('dotenv').config();
 
 const { downloadImage } = require('./webcamImageDownload');
 const { extractTextFromImage } = require('./webcamImageOCR');
 const { constructImageUrl } = require('./fileUtils');
 
-async function extractWeatherData() {
+async function extractWebcamData() {
   let imageUrl;
   imageUrl = process.env.NODE_ENV === 'production' ? (imageUrl = constructImageUrl()) : (imageUrl = process.env.WEBCAM_TEST_IMAGE_URL);
 
   let imagePath;
-  let snapshotDataObject = {
-    // Initialize with default values
-    date_time: null,
-    temperature_celsius: null,
-    wind_speed_kph: null,
-    total_precipitation_mm: null,
-    snow_coverage: null,
-    detected_objects: null,
-  };
+  let snapshotDataObject = {};
 
   try {
     console.log('Fetching: ', imageUrl);
@@ -83,34 +74,13 @@ async function extractWeatherData() {
       )}T${hours}:${minutes}:${seconds}${offset}`;
     }
 
-    snapshotDataObject = {
+    return (snapshotDataObject = {
       date_time: dateTime,
       temperature_celsius: temperature,
       wind_speed_kph: windSpeed,
       total_precipitation_mm: precipitation,
-      //snow_coverage: 0,
-      //detected_objects: ['building', 'car', 'road'],
-    };
-  }
-  return snapshotDataObject;
-}
-
-async function extractWebcamData() {
-  if (process.env.NODE_ENV === 'development') {
-    // run the program instantly for testing purposes
-    let snapshotDataObject = await extractWeatherData();
-    return snapshotDataObject;
-  } else {
-    console.log('Webcam Data extraction scheduled. Press Ctrl+C to exit.');
-    // Schedule the program to run every two minutes between 6:00 and 21:58
-    cron.schedule('*/2 6-21 * * *', () => {
-      const now = new Date();
-      console.log(`Running at ${now.toLocaleTimeString()}`);
-
-      setTimeout(async () => {
-        let snapshotDataObject = await extractWeatherData();
-        return snapshotDataObject;
-      }, 30000);
+      now_coverage: null,
+      detected_objects: [],
     });
   }
 }

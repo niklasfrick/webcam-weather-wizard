@@ -1,3 +1,4 @@
+require('dotenv').config();
 const { createWorker } = require('tesseract.js');
 const { preprocessImage } = require('./imagePreprocess');
 
@@ -20,8 +21,8 @@ async function extractTextFromImage(imagePath, dataType) {
   const { topLeftX, topLeftY, bottomRightX, bottomRightY } = cropCoordinates[dataType];
   const preprocessedImagePath = await preprocessImage(imagePath, dataType, topLeftX, topLeftY, bottomRightX, bottomRightY);
   const worker = await createWorker();
-  await worker.loadLanguage('deu');
-  await worker.initialize('deu');
+  await worker.loadLanguage(process.env.TESSERACT_LANG);
+  await worker.initialize(process.env.TESSERACT_LANG);
   const {
     data: { text },
   } = await worker.recognize(preprocessedImagePath);

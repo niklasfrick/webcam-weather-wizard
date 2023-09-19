@@ -47,7 +47,7 @@ describe('MongoDB Connector Tests', () => {
     const foundDocument = await collection.findOne(query);
     expect(foundDocument).toEqual({
       _id: objectId,
-      date_time: '2023-09-14T17:26:04Z',
+      date_time: '2023-09-14T17:26:04+02:00',
       temperature_celsius: 14.6,
       wind_speed_kph: 1.4,
       total_precipitation_mm: 2,
