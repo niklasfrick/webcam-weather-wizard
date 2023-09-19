@@ -1,6 +1,6 @@
 const cron = require('node-cron');
 const extractWebcamData = require('./webcam/webcamData');
-const { writeSnapshotData, readSnapshotData } = require('./database/databaseCommands');
+const { dbWriteSnapshotData } = require('./database/databaseCommands');
 
 // Configuration
 const schedule = '*/2 6-21 * * *'; // Every two minutes between 6:00 and 21:58
@@ -12,7 +12,7 @@ async function main() {
     try {
       const snapshotData = await extractWebcamData();
       console.log(snapshotData);
-      writeSnapshotData(snapshotData);
+      dbWriteSnapshotData(snapshotData);
     } catch (error) {
       console.error('Error while extracting webcam data:', error);
     }
@@ -28,7 +28,7 @@ async function main() {
         try {
           const snapshotData = await extractWebcamData();
           console.log(snapshotData);
-          writeSnapshotData(snapshotData);
+          dbWriteSnapshotData(snapshotData);
         } catch (error) {
           console.error('Error while extracting webcam data:', error);
         }

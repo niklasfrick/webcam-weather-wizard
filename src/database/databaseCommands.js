@@ -3,7 +3,7 @@ const { connectToDatabase, closeDatabase } = require('./databaseConnector');
 const snapshotDataSchema = require('./snapshot-data.schema.json');
 
 // Function to write data to the database, checking against the schema
-async function writeSnapshotData(snapshotData) {
+async function dbWriteSnapshotData(snapshotData) {
   const db = await connectToDatabase();
   const collection = db.collection('snapshot-data');
 
@@ -39,4 +39,4 @@ async function writeSnapshotData(snapshotData) {
   closeDatabase();
 }
 
-module.exports = { writeSnapshotData };
+module.exports = { dbWriteSnapshotData };
